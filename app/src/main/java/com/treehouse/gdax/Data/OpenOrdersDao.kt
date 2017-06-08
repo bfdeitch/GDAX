@@ -1,9 +1,9 @@
-package com.treehouse.gdax
+package com.treehouse.gdax.Data
 
 import android.arch.persistence.room.Dao
+import android.arch.persistence.room.Delete
 import android.arch.persistence.room.Insert
 import android.arch.persistence.room.Query
-import android.arch.persistence.room.Delete
 
 @Dao
 interface OpenOrdersDao {
