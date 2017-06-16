@@ -70,7 +70,7 @@ class MessageParser(val db: AppDatabase) {
     val order_type = json["order_type"] as String
     val size = if (order_type == "limit") json["size"] as String else ""
     val price = if (order_type == "limit") json["price"] as String else ""
-    val funds = if (order_type == "limit") "" else json["funds"] as String
+    val funds = if (json.has("funds")) json["funds"] as String else ""
     val sequence = json["sequence"] as Int
     val time = json["time"] as String
     val order_id = json["order_id"] as String

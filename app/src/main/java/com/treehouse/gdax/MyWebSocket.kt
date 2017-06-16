@@ -14,7 +14,7 @@ class MyWebSocket (db: AppDatabase) {
     }
 
     override fun onMessage(webSocket: WebSocket, text: String) {
-      e("MESSAGE: " + text)
+      //e("MESSAGE: " + text)
       parser.readMessage(text)
     }
 
