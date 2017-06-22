@@ -47,8 +47,8 @@ class MessageParser(val db: AppDatabase) {
     val maker_order_id = json["maker_order_id"] as String
     val taker_order_id = json["taker_order_id"] as String
     val time = json["time"] as String
-    val size = json["size"] as String
-    val price = json["price"] as String
+    val size = json.getString("size").toFloat()
+    val price = json.getString("price").toFloat()
     val side = json["side"] as String
     val event = MatchOrder(sequence, "match", trade_id, maker_order_id, taker_order_id, time, size, price, side)
     db.matchOrdersDao().insert(event)
