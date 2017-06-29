@@ -2,23 +2,21 @@ package com.treehouse.gdax
 
 import android.arch.lifecycle.LifecycleActivity
 import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
 import android.arch.persistence.room.Room
-import android.graphics.Color
 import android.os.Bundle
+import android.support.v4.widget.DrawerLayout
 import android.support.v7.widget.LinearLayoutManager
+import android.view.Gravity
 import com.treehouse.gdax.Data.AppDatabase
-import org.jetbrains.anko.appcompat.v7.toolbar
-import org.jetbrains.anko.backgroundColor
-import org.jetbrains.anko.design.appBarLayout
-import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.*
 import org.jetbrains.anko.recyclerview.v7.recyclerView
-import org.jetbrains.anko.relativeLayout
 import org.jetbrains.anko.support.v4.drawerLayout
-import org.jetbrains.anko.wrapContent
 import kotlin.concurrent.thread
 
 
 class MainActivity : LifecycleActivity() {
+  var drawer: DrawerLayout? = null
   val db = Room.databaseBuilder(this, AppDatabase::class.java, "GDAX").build()
   val webSocket = MyWebSocket(db)
 
@@ -44,17 +42,13 @@ class MainActivity : LifecycleActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-//    val actionBarHeight = theme.obtainStyledAttributes(intArrayOf(android.R.attr.actionBarSize)).getDimension(0, 0f).toInt()
-//    e("actionBarHeight: $actionBarHeight")
-//    drawerLayout {
-//      appBarLayout {
-//        toolbar {
-//          title = "Hello world!"
-//        }.lparams(width = matchParent, height = actionBarHeight)
-//      }.lparams(width = matchParent, height = wrapContent)
+    // TODO: uncomment
+    //val viewModel = ViewModelProviders.of(this@MainActivity).get(TradeHistoryViewModel::class.java)
+
+    drawer = drawerLayout {
 
       relativeLayout {
-        backgroundColor = Color.parseColor("#1e2b34")
+        backgroundColor = primaryColor
 
         val myAdapter = MyAdapter(db)
         val myLayoutManger = LinearLayoutManager(this@MainActivity, LinearLayoutManager.VERTICAL, false)
@@ -72,7 +66,14 @@ class MainActivity : LifecycleActivity() {
           })
           layoutManager = myLayoutManger
         }.lparams(width = matchParent)
-//      }.lparams(width = matchParent)
+      }.lparams(width = matchParent, height = matchParent)
+
+      // Drawer
+      val navDrawer = NavDrawer(this@MainActivity, { drawer!!.closeDrawers() })
+      navDrawer.lparams(width = dip(250), height = matchParent) {
+        gravity = Gravity.START
+      }
+      this.addView(navDrawer)
     }
   }
 
