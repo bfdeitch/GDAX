@@ -4,7 +4,7 @@ https://www.gdax.com/trade/ETH-USD.
 All work on this app is being live-streamed and can be found here: 
 https://www.youtube.com/playlist?list=PLuC2HflhhpLGPgZ4bP27Lw_jBwgwtBttm
 
-/n/n
+\n
 If you're having trouble running the app, and you're getting an error like:
 Unable to find method 'com.android.build.gradle.internal.variant.BaseVariantData.getOutputs()Ljava/util/List'...
 
