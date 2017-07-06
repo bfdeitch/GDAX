@@ -11,7 +11,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 data class Trade(val isBuy: Boolean, val size: Float, val price: Float, val time: String)
-class MyAdapter(val db: AppDatabase) : RecyclerView.Adapter<MyAdapter.ViewHolder>() {
+class MyAdapter : RecyclerView.Adapter<MyAdapter.ViewHolder>() {
   val trades = mutableListOf<Trade>()
 
   override fun getItemCount() = trades.size

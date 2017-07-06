@@ -1,11 +1,13 @@
 package com.treehouse.gdax
 
+import android.arch.lifecycle.Lifecycle
+import android.arch.lifecycle.LifecycleObserver
+import android.arch.lifecycle.OnLifecycleEvent
 import com.treehouse.gdax.Data.AppDatabase
 import okhttp3.*
 import java.util.concurrent.TimeUnit
 
-
-class MyWebSocket (db: AppDatabase) {
+class MyWebSocket : LifecycleObserver {
   val parser = MessageParser(db)
 
   val listener = object : WebSocketListener() {
@@ -39,6 +41,7 @@ class MyWebSocket (db: AppDatabase) {
 
   val webSocket = client.newWebSocket(request, listener)
 
+  @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
   fun shutDown() {
     webSocket.close(1000, "Goodbye, World!")
     client.dispatcher().executorService().shutdown()
