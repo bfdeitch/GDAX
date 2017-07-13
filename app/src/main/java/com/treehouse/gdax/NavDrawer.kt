@@ -2,11 +2,17 @@ package com.treehouse.gdax
 
 import android.content.Context
 import android.graphics.Color
+import android.support.v4.app.Fragment
 import org.jetbrains.anko.*
 
 
-class NavDrawer(context: Context, action: () -> Unit) : _LinearLayout(context) {
-    val items = arrayOf("Trade History", "Order Book", "Charts")
+data class NavDrawerEntry(val title: String, val fragment: Fragment)
+val navDrawerItems = arrayOf(
+        NavDrawerEntry("Trade History", TradeHistoryFragment()),
+        NavDrawerEntry("Order Book", OrdersFragment()),
+        NavDrawerEntry("Charts", OrdersFragment()))
+
+class NavDrawer(context: Context, action: (NavDrawerEntry) -> Unit) : _LinearLayout(context) {
     init {
         orientation = VERTICAL
         backgroundColor = primaryColorLight
@@ -15,14 +21,14 @@ class NavDrawer(context: Context, action: () -> Unit) : _LinearLayout(context) {
             backgroundColor = green
         }.lparams(width = matchParent, height = dip(100))
 
-        items.forEach { name ->
-            textView(name) {
+        navDrawerItems.forEach { entry ->
+            textView(entry.title) {
                 textColor = Color.WHITE
                 textSize = 22f
                 padding  = dip(16)
                 onClick {
-                    action()
-                    context.toast(name)
+                    action(entry)
+                    context.toast(entry.title)
                 }
             }.lparams(width = matchParent, height = dip(75))
         }
