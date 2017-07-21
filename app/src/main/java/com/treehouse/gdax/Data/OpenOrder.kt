@@ -10,6 +10,6 @@ data class OpenOrder(
     @ColumnInfo var type: String = "",
     @ColumnInfo var time: String = "",
     @ColumnInfo var order_id: String = "",
-    @ColumnInfo var price: String = "",
-    @ColumnInfo var remaining_size: String = "",
+    @ColumnInfo var price: Float = 0f,
+    @ColumnInfo var remaining_size: Float = 0f,
     @ColumnInfo var side: String = "")

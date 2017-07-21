@@ -58,12 +58,11 @@ class MessageParser(val db: AppDatabase) {
     val sequence = json["sequence"] as Int
     val time = json["time"] as String
     val order_id = json["order_id"] as String
-    val price = json["price"] as String
-    val remaining_size = json["remaining_size"] as String
+    val price = json.getString("price").toFloat()
+    val remaining_size = json.getString("remaining_size").toFloat()
     val side = json["side"] as String
     val event = OpenOrder(sequence, "open", time, order_id, price, remaining_size, side)
     db.openOrdersDao().insert(event)
-
   }
 
   private fun readReceivedMessage(json: JSONObject) {

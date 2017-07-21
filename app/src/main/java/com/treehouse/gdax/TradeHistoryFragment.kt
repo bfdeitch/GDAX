@@ -16,15 +16,15 @@ class TradeHistoryFragment : LifecycleFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val viewModel = ViewModelProviders.of(this).get(TradeHistoryViewModel::class.java)
         return context.recyclerView {
-            val myAdapter = MyAdapter()
-            adapter = myAdapter
+            val tradeHistoryAdapter = TradeHistoryAdapter()
+            adapter = tradeHistoryAdapter
             viewModel.trades.observe(this@TradeHistoryFragment, Observer {
                 // it == List<MatchOrder>
                 if (it != null) {
                     val trades = it.map { Trade(it.side == "sell", it.size, it.price, it.time) }
-                    myAdapter.trades.clear()
-                    myAdapter.trades.addAll(trades)
-                    myAdapter.notifyDataSetChanged()
+                    tradeHistoryAdapter.trades.clear()
+                    tradeHistoryAdapter.trades.addAll(trades)
+                    tradeHistoryAdapter.notifyDataSetChanged()
                 }
             })
             val myLayoutManger = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)

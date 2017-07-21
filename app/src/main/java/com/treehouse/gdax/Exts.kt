@@ -12,3 +12,9 @@ val primaryColorLight = Color.parseColor("#2F3D45")
 fun Any.e(any: Any? = "no message provided") {
   Log.e(this.javaClass.simpleName + "`~", any.toString())
 }
+
+fun formatNumString(number: Float, decimalSpots: Int): String {
+  val beforeDec = number.toString().substringBefore(".")
+  val afterDec = number.toString().substringAfter(".").padEnd(decimalSpots, '0')
+  return "$beforeDec.$afterDec"
+}

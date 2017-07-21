@@ -21,7 +21,8 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    testCompile 'junit:junit:4.12'
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
@@ -30,19 +31,21 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:25.3.1'
     compile 'com.android.support:design:25.3.1'
 
+    compile 'com.github.kittinunf.fuel:fuel-android:1.9.0' //for Android
+
     compile 'org.jetbrains.anko:anko-sdk21:0.9' // sdk15, sdk19, sdk21, sdk23 are also available
     compile 'org.jetbrains.anko:anko-appcompat-v7:0.9' // For appcompat-v7 bindings
     compile 'org.jetbrains.anko:anko-design:0.9'
     compile 'org.jetbrains.anko:anko-recyclerview-v7:0.9'
 
     compile 'com.squareup.okhttp3:okhttp:3.8.0'
-    testCompile 'junit:junit:4.12'
 
-    compile "android.arch.lifecycle:runtime:1.0.0-alpha1"
-    compile "android.arch.lifecycle:extensions:1.0.0-alpha1"
+    compile 'android.arch.lifecycle:runtime:1.0.0-alpha1'
+    compile 'android.arch.lifecycle:extensions:1.0.0-alpha1'
     kapt "android.arch.lifecycle:compiler:1.0.0-alpha1"
-    compile "android.arch.persistence.room:runtime:1.0.0-alpha1"
+    compile 'android.arch.persistence.room:runtime:1.0.0-alpha1'
     kapt "android.arch.persistence.room:compiler:1.0.0-alpha1"
-    testCompile "android.arch.persistence.room:testing:1.0.0-alpha1"
+    testCompile 'android.arch.persistence.room:testing:1.0.0-alpha1'
+
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
 }

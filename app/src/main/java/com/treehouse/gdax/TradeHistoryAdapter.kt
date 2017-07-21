@@ -5,13 +5,12 @@ import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import com.treehouse.gdax.Data.AppDatabase
 import org.jetbrains.anko.*
 import java.util.*
 import java.util.concurrent.TimeUnit
 
 data class Trade(val isBuy: Boolean, val size: Float, val price: Float, val time: String)
-class MyAdapter : RecyclerView.Adapter<MyAdapter.ViewHolder>() {
+class TradeHistoryAdapter : RecyclerView.Adapter<TradeHistoryAdapter.ViewHolder>() {
   val trades = mutableListOf<Trade>()
 
   override fun getItemCount() = trades.size
@@ -48,12 +47,5 @@ class MyAdapter : RecyclerView.Adapter<MyAdapter.ViewHolder>() {
       hours = if (hours < 0) 24 + hours else hours
       timeTextView.text = "$hours:$minutesSeconds"
     }
-
-    fun formatNumString(number: Float, decimalSpots: Int): String {
-      val beforeDec = number.toString().substringBefore(".")
-      val afterDec = number.toString().substringAfter(".").padEnd(decimalSpots, '0')
-      return "$beforeDec.$afterDec"
-    }
-
   }
 }
