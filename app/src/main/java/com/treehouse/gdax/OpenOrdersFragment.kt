@@ -20,7 +20,7 @@ class OpenOrdersFragment : LifecycleFragment() {
             viewModel.openOrders.observe(this@OpenOrdersFragment, Observer {
                 // it == List<OpenOrder>
                 if (it != null) {
-                    val openOrders = it.map { Order(it.side == "buy", it.remaining_size, it.price) }
+                    val openOrders = it.map { Order(it.side == "buy", it.remaining_size, it.price, it.order_id) }
                     val bids = openOrders.filter { it.isBid }.sortedByDescending { it.price }.take(10)
                     val asks = openOrders.filter { !it.isBid }.sortedBy { it.price }.take(10)
                     val list = mutableListOf<Order>()

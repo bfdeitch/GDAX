@@ -33,7 +33,7 @@ class TradeHistoryAdapter : RecyclerView.Adapter<TradeHistoryAdapter.ViewHolder>
     fun update(trade: Trade) {
       val color = if (trade.isBuy) green else red
       sizeBar.backgroundColor = color
-      val viewWidth = view.dip(if (trade.size > 80) 80f else trade.size + 1f)
+      val viewWidth = view.dip(if (trade.size > 200) 200f else trade.size + 1f)
       sizeBar.layoutParams = ConstraintLayout.LayoutParams(viewWidth, 0)
       sizeTextView.text = formatNumString(trade.size, 8)
       priceTextView.text = formatNumString(trade.price, 2)

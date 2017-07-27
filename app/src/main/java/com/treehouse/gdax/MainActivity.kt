@@ -7,7 +7,6 @@ import android.support.design.widget.AppBarLayout
 import android.support.v4.widget.DrawerLayout
 import android.view.Gravity
 import android.widget.Toolbar
-import com.github.kittinunf.fuel.android.extension.responseJson
 import com.github.kittinunf.fuel.httpGet
 import org.jetbrains.anko.*
 import org.jetbrains.anko.design.appBarLayout
@@ -19,15 +18,6 @@ class MainActivity : LifecycleActivity() {
   lateinit var drawer: DrawerLayout
   lateinit var toolbar: Toolbar
 
-  fun clearDatabase() {
-    thread {
-      with(db.receivedOrdersDao()) { delete(getAll()) }
-      with(db.openOrdersDao()) { delete(getAll()) }
-      with(db.changeOrdersDao()) { delete(getAll()) }
-      with(db.doneOrdersDao()) { delete(getAll()) }
-      with(db.matchOrdersDao()) { delete(getAll()) }
-    }
-  }
   fun logDatabase() {
     thread {
       db.receivedOrdersDao().getAll().forEach { e(it) }
@@ -37,30 +27,19 @@ class MainActivity : LifecycleActivity() {
       db.matchOrdersDao().getAll().forEach { e(it) }
     }
   }
-  val endpoint = "https://api.gdax.com/products/ETH-USD/book?level=2"
-  fun x() {
-    endpoint.httpGet().responseJson { request, response, result ->
-      result.fold({ data ->
-        val json = data.obj()
-        val sequence = json["sequence"]
-        val bids = json.getJSONArray("bids")
-        val asks = json.getJSONArray("asks")
-        e(data)
-        e(sequence)
-        e(bids)
-        e(asks)
-      }, { error ->
-        e(error)
-      })
-    }
-  }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    clearDatabase()
-    x()
 
     lifecycle.addObserver(MyWebSocket())
+
+    thread {
+      while (true) {
+        Thread.sleep(5000)
+        val bestBuys = db.openOrdersDao().getAll()
+        e("Size: ${bestBuys.size}, BestBuy: ${bestBuys[0]}")
+      }
+    }
 
     drawer = drawerLayout {
 

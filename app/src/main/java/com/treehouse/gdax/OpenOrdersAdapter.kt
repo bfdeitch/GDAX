@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import org.jetbrains.anko.*
 
-data class Order(val isBid: Boolean, val size: Float, val price: Float)
+data class Order(val isBid: Boolean, val size: Float, val price: Float, val orderId: String)
 class OpenOrdersAdapter : RecyclerView.Adapter<OpenOrdersAdapter.ViewHolder>() {
     val openOrders = mutableListOf<Order>()
 

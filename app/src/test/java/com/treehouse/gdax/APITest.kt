@@ -1,24 +1,30 @@
 package com.treehouse.gdax
 
 import com.github.kittinunf.fuel.*
-import com.github.kittinunf.result.*
+import org.json.JSONObject
 import org.junit.Test
 
 class APITest {
-    val endpoint = "https://api.gdax.com/products/ETH-USD/book?level=2"
+    val endpoint = "https://api.gdax.com/products/ETH-USD/book?level=3"
 
     @Test
     fun runTest() {
-        endpoint.httpGet().responseString { request, response, result ->
-            result.fold({ data ->
-                data
-            }, { error ->
-                println(error)
-            })
-            println(request)
-            println(response)
-            println(result)
-        }
+        val (request, response, result) = endpoint.httpGet().responseString()
+        println("TEST")
+        result.fold({ data ->
+            val json = JSONObject(data)
+            val sequence = json["sequence"]
+            val bids = json.getJSONArray("bids")
+            val asks = json.getJSONArray("asks")
+            println(sequence)
+            println(bids)
+            (0..asks.length()).map {
+                println(asks.getJSONArray(it)[0])
+                println(asks[it])
+            }
+        }, { error ->
+            println(error)
+        })
         assert(true)
     }
 }
