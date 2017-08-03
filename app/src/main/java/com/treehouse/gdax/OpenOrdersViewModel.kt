@@ -5,10 +5,11 @@ import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import com.treehouse.gdax.Data.OpenOrder
+import com.treehouse.gdax.Data.PriceSideTuple
 
 
 class OpenOrdersViewModel (app: Application) : AndroidViewModel(app) {
-    val openOrders: LiveData<List<OpenOrder>> = MutableLiveData<List<OpenOrder>>()
+    val openOrders: LiveData<List<PriceSideTuple>> = MutableLiveData<List<PriceSideTuple>>()
         get() {
             if (field.value == null) {
                 e("loaded open orders")

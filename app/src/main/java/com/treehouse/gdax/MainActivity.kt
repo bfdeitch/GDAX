@@ -7,7 +7,6 @@ import android.support.design.widget.AppBarLayout
 import android.support.v4.widget.DrawerLayout
 import android.view.Gravity
 import android.widget.Toolbar
-import com.github.kittinunf.fuel.httpGet
 import org.jetbrains.anko.*
 import org.jetbrains.anko.design.appBarLayout
 import org.jetbrains.anko.design.coordinatorLayout
@@ -36,8 +35,14 @@ class MainActivity : LifecycleActivity() {
     thread {
       while (true) {
         Thread.sleep(5000)
-        val bestBuys = db.openOrdersDao().getAll()
-        e("Size: ${bestBuys.size}, BestBuy: ${bestBuys[0]}")
+        val numBids = db.openOrdersDao().getCt()
+        e("Num Bids: $numBids")
+
+        val bestBids = db.openOrdersDao().getBids()
+        e("Size: ${bestBids.size}, BestBid: ${bestBids[0]}")
+
+        val bestAsks = db.openOrdersDao().getAsks()
+        e("Size: ${bestAsks.size}, BestAsk: ${bestAsks[0]}")
       }
     }
 

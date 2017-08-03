@@ -27,6 +27,9 @@ class MyWebSocket : LifecycleObserver {
       e("FAILURE------------------------------------------------------------")
       e(t)
       e(t.stackTrace)
+      t.stackTrace.forEach {
+        e(it)
+      }
       t.printStackTrace()
       e(response)
     }

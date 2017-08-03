@@ -39,6 +39,9 @@ class MessageParser(val db: AppDatabase) {
     val remaining_size = if (json.has("remaining_size")) json["remaining_size"] as String else ""
     val event = DoneOrder(sequence, "done", time, price, order_id, reason, side, remaining_size)
     db.doneOrdersDao().insert(event)
+
+    val openOrder = OpenOrder(order_id = order_id)
+    db.openOrdersDao().delete(openOrder)
   }
 
   private fun readMatchMessage(json: JSONObject) {
@@ -52,6 +55,15 @@ class MessageParser(val db: AppDatabase) {
     val side = json["side"] as String
     val event = MatchOrder(sequence, "match", trade_id, maker_order_id, taker_order_id, time, size, price, side)
     db.matchOrdersDao().insert(event)
+
+    // taker order's seem to always be null
+    val makerOrder = db.openOrdersDao().getOrder(maker_order_id)
+    if (makerOrder != null) {
+      makerOrder.remaining_size -= size
+      db.openOrdersDao().updateOrder(makerOrder)
+    } else {
+      e("MAKER ORDER IS NULL")
+    }
   }
 
   private fun readOpenMessage(json: JSONObject) {
@@ -77,5 +89,4 @@ class MessageParser(val db: AppDatabase) {
     val event = ReceivedOrder(sequence, "received", time, order_id, size, price, funds, side, order_type)
     db.receivedOrdersDao().insert(event)
   }
-
 }

@@ -8,6 +8,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.treehouse.gdax.Data.PriceSideTuple
 import org.jetbrains.anko.recyclerview.v7.recyclerView
 
 class OpenOrdersFragment : LifecycleFragment() {
@@ -18,12 +19,11 @@ class OpenOrdersFragment : LifecycleFragment() {
             val openOrdersAdapter = OpenOrdersAdapter()
             adapter = openOrdersAdapter
             viewModel.openOrders.observe(this@OpenOrdersFragment, Observer {
-                // it == List<OpenOrder>
+                // it == List<PriceSideTuple>
                 if (it != null) {
-                    val openOrders = it.map { Order(it.side == "buy", it.remaining_size, it.price, it.order_id) }
-                    val bids = openOrders.filter { it.isBid }.sortedByDescending { it.price }.take(10)
-                    val asks = openOrders.filter { !it.isBid }.sortedBy { it.price }.take(10)
-                    val list = mutableListOf<Order>()
+                    val bids = it.filter { it.side == "buy" }.sortedByDescending { it.price }.take(10)
+                    val asks = it.filter { it.side == "sell" }.sortedBy { it.price }.take(10)
+                    val list = mutableListOf<PriceSideTuple>()
                     list.addAll(asks)
                     list.addAll(bids)
 
