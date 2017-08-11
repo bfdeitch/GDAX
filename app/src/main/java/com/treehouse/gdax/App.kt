@@ -42,7 +42,7 @@ class App : Application() {
             e("ORDER BOOK RETRIEVED")
             result.fold({ data ->
                 val json = JSONObject(data)
-                val sequence = json["sequence"] as Int
+                val sequence = json.getString("sequence").toLong()
                 val bids = json.getJSONArray("bids")
                 val asks = json.getJSONArray("asks")
                 addOpenOrders("buy", sequence, bids)
@@ -51,12 +51,12 @@ class App : Application() {
         }
     }
 
-    private fun addOpenOrders(side: String, sequence: Int, orders: JSONArray) {
+    private fun addOpenOrders(side: String, sequence: Long, orders: JSONArray) {
         e("ADDING OPEN ORDERS - NUM ORDERS: ${orders.length()}")
         val openOrders: MutableList<OpenOrder> = mutableListOf()
         (0..orders.length()-1).map {
             val price = orders.getJSONArray(it)[0].toString().toFloat()
-            val size = orders.getJSONArray(it)[1].toString().toFloat()
+            val size = orders.getJSONArray(it)[1].toString().toDouble()
             val order_id = orders.getJSONArray(it)[2] as String
             val event = OpenOrder(sequence, "open", "", order_id, price, size, side)
             openOrders.add(event)

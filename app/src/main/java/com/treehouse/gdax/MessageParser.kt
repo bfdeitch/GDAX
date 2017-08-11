@@ -18,7 +18,7 @@ class MessageParser(val db: AppDatabase) {
   }
 
   private fun readChangeMessage(json: JSONObject) {
-    val sequence = json["sequence"] as Int
+    val sequence = json.getString("sequence").toLong()
     val time = json["time"] as String
     val order_id = json["order_id"] as String
     val new_size = json["new_size"] as String
@@ -27,10 +27,18 @@ class MessageParser(val db: AppDatabase) {
     val side = json["side"] as String
     val event = ChangeOrder(sequence, "change", time, order_id, new_size, old_size, price, side)
     db.changeOrdersDao().insert(event)
+
+    val changedOrder = db.openOrdersDao().getOrder(order_id)
+    if (changedOrder != null) {
+      changedOrder.remaining_size = new_size.toDouble()
+      db.openOrdersDao().updateOrder(changedOrder)
+    } else {
+      e("CHANGED ORDER IS NULL")
+    }
   }
 
   private fun readDoneMessage(json: JSONObject) {
-    val sequence = json["sequence"] as Int
+    val sequence = json.getString("sequence").toLong()
     val time = json["time"] as String
     val price = if (json.has("price")) json["price"] as String else ""
     val order_id = json["order_id"] as String
@@ -45,7 +53,8 @@ class MessageParser(val db: AppDatabase) {
   }
 
   private fun readMatchMessage(json: JSONObject) {
-    val sequence = json["sequence"] as Int
+    e("MATCH MESSAGE RECEIVED")
+    val sequence = json.getString("sequence").toLong()
     val trade_id = json["trade_id"] as Int
     val maker_order_id = json["maker_order_id"] as String
     val taker_order_id = json["taker_order_id"] as String
@@ -64,14 +73,16 @@ class MessageParser(val db: AppDatabase) {
     } else {
       e("MAKER ORDER IS NULL")
     }
+
+    e("MATCHED_ORDER ${event.price}     |    $event")
   }
 
   private fun readOpenMessage(json: JSONObject) {
-    val sequence = json["sequence"] as Int
+    val sequence = json.getString("sequence").toLong()
     val time = json["time"] as String
     val order_id = json["order_id"] as String
     val price = json.getString("price").toFloat()
-    val remaining_size = json.getString("remaining_size").toFloat()
+    val remaining_size = json.getString("remaining_size").toDouble()
     val side = json["side"] as String
     val event = OpenOrder(sequence, "open", time, order_id, price, remaining_size, side)
     db.openOrdersDao().insert(event)
@@ -82,7 +93,7 @@ class MessageParser(val db: AppDatabase) {
     val size = if (order_type == "limit") json["size"] as String else ""
     val price = if (order_type == "limit") json["price"] as String else ""
     val funds = if (json.has("funds")) json["funds"] as String else ""
-    val sequence = json["sequence"] as Int
+    val sequence = json.getString("sequence").toLong()
     val time = json["time"] as String
     val order_id = json["order_id"] as String
     val side = json["side"] as String

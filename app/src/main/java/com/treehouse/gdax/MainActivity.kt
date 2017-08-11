@@ -4,17 +4,22 @@ import android.arch.lifecycle.LifecycleActivity
 import android.graphics.Color
 import android.os.Bundle
 import android.support.design.widget.AppBarLayout
+import android.support.design.widget.BottomNavigationView
+import android.support.v4.app.Fragment
 import android.support.v4.widget.DrawerLayout
 import android.view.Gravity
 import android.widget.Toolbar
 import org.jetbrains.anko.*
-import org.jetbrains.anko.design.appBarLayout
-import org.jetbrains.anko.design.coordinatorLayout
-import org.jetbrains.anko.support.v4.drawerLayout
+import org.jetbrains.anko.design.*
 import kotlin.concurrent.thread
 
+data class BottomNavEntry(val title: String, val fragment: Fragment)
+val bottomNavItems = arrayOf(
+        BottomNavEntry("Order Book", OpenOrdersFragment()),
+        BottomNavEntry("Charts", OpenOrdersFragment()),
+        BottomNavEntry("Trade History", TradeHistoryFragment()))
+
 class MainActivity : LifecycleActivity() {
-  lateinit var drawer: DrawerLayout
   lateinit var toolbar: Toolbar
 
   fun logDatabase() {
@@ -32,23 +37,22 @@ class MainActivity : LifecycleActivity() {
 
     lifecycle.addObserver(MyWebSocket())
 
-    thread {
-      while (true) {
-        Thread.sleep(5000)
-        val numBids = db.openOrdersDao().getCt()
-        e("Num Bids: $numBids")
-
-        val bestBids = db.openOrdersDao().getBids()
-        e("Size: ${bestBids.size}, BestBid: ${bestBids[0]}")
-
-        val bestAsks = db.openOrdersDao().getAsks()
-        e("Size: ${bestAsks.size}, BestAsk: ${bestAsks[0]}")
-      }
-    }
-
-    drawer = drawerLayout {
+//    thread {
+//      while (true) {
+//        Thread.sleep(5000)
+//        val numBids = db.openOrdersDao().getCt()
+//        e("Num Bids: $numBids")
+//
+//        val bestBids = db.openOrdersDao().getBids()
+//        e("Size: ${bestBids.size}, BestBid: ${bestBids[0]}")
+//
+//        val bestAsks = db.openOrdersDao().getAsks()
+//        e("Size: ${bestAsks.size}, BestAsk: ${bestAsks[0]}")
+//      }
+//    }
 
       coordinatorLayout {
+        lparams(width = matchParent, height = matchParent)
         backgroundColor = primaryColor
 
         appBarLayout {
@@ -57,14 +61,11 @@ class MainActivity : LifecycleActivity() {
             title = "Trade History"
             setTitleTextColor(Color.WHITE)
             backgroundColor = primaryColorLight
-            setNavigationIcon(R.drawable.ic_menu_black_24dp)
           }.lparams(width = matchParent, height = actionBarHeight) {
             scrollFlags = AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL or
                     AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS
           }
           this@MainActivity.setActionBar(toolbar)
-          actionBar!!.setDisplayHomeAsUpEnabled(true)
-          toolbar.setNavigationOnClickListener { drawer.openDrawer(Gravity.LEFT) }
         }.lparams(width = matchParent)
 
         frameLayout {
@@ -72,23 +73,25 @@ class MainActivity : LifecycleActivity() {
         }.lparams(width = matchParent, height = matchParent) {
           behavior = AppBarLayout.ScrollingViewBehavior()
         }
-      }.lparams(width = matchParent, height = matchParent)
 
-      // Drawer
-      val navDrawer = NavDrawer(this@MainActivity, {
-        switchFragment(it)
-        drawer.closeDrawers()
-      })
-      navDrawer.lparams(width = dip(250), height = matchParent) {
-        gravity = Gravity.START
+        val bottomNav = include<BottomNavigationView>(R.layout.bottom_navigation) {
+            setOnNavigationItemSelectedListener {
+              when (it.itemId) {
+                R.id.openOrders -> switchFragment(bottomNavItems[0])
+                R.id.priceChart -> switchFragment(bottomNavItems[1])
+                R.id.tradeHistory -> switchFragment(bottomNavItems[2])
+              }
+              true
+            }
+        }.lparams {
+          gravity = Gravity.BOTTOM
+        }
       }
-      this.addView(navDrawer)
-    }
 
-    switchFragment(navDrawerItems[0])
+    switchFragment(bottomNavItems[2])
   }
 
-  fun switchFragment(entry: NavDrawerEntry) {
+  fun switchFragment(entry: BottomNavEntry) {
     e("SWITCH FRAGMENT: ${entry.fragment}")
     val fragmentTransaction = supportFragmentManager.beginTransaction()
     fragmentTransaction.replace(123, entry.fragment)

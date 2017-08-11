@@ -5,7 +5,7 @@ import android.arch.persistence.room.PrimaryKey
 
 @android.arch.persistence.room.Entity(tableName = "RECEIVED_ORDERS")
 data class ReceivedOrder (
-    @PrimaryKey var sequence: Int = 0,
+    @PrimaryKey var sequence: Long = 0,
     @ColumnInfo var type: String = "",
     @ColumnInfo var time: String = "",
     @ColumnInfo var order_id: String = "",

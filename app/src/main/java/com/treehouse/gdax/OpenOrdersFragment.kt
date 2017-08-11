@@ -24,7 +24,7 @@ class OpenOrdersFragment : LifecycleFragment() {
                     val bids = it.filter { it.side == "buy" }.sortedByDescending { it.price }.take(10)
                     val asks = it.filter { it.side == "sell" }.sortedBy { it.price }.take(10)
                     val list = mutableListOf<PriceSideTuple>()
-                    list.addAll(asks)
+                    list.addAll(asks.reversed())
                     list.addAll(bids)
 
                     openOrdersAdapter.openOrders.clear()
