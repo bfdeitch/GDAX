@@ -9,7 +9,7 @@ import org.jetbrains.anko.*
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-data class Trade(val isBuy: Boolean, val size: Float, val price: Float, val time: String)
+data class Trade(val isBuy: Boolean, val size: Double, val price: Float, val time: String)
 class TradeHistoryAdapter : RecyclerView.Adapter<TradeHistoryAdapter.ViewHolder>() {
   val trades = mutableListOf<Trade>()
 
@@ -33,9 +33,11 @@ class TradeHistoryAdapter : RecyclerView.Adapter<TradeHistoryAdapter.ViewHolder>
     fun update(trade: Trade) {
       val color = if (trade.isBuy) green else red
       sizeBar.backgroundColor = color
-      val viewWidth = view.dip(if (trade.size > 200) 200f else trade.size + 1f)
+      val maxSizeWidth = view.context.widthPixels / 4f
+      val size = if (trade.size > 1000) 1000.0 else trade.size
+      val viewWidth = (size / 1000 * maxSizeWidth).toInt() + 1
       sizeBar.layoutParams = ConstraintLayout.LayoutParams(viewWidth, 0)
-      sizeTextView.text = formatNumString(trade.size, 8)
+      sizeTextView.text = formatSizeString(trade.size)
       priceTextView.text = formatNumString(trade.price, 2)
       priceTextView.textColor = color
 

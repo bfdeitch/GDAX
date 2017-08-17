@@ -37,20 +37,6 @@ class MainActivity : LifecycleActivity() {
 
     lifecycle.addObserver(MyWebSocket())
 
-//    thread {
-//      while (true) {
-//        Thread.sleep(5000)
-//        val numBids = db.openOrdersDao().getCt()
-//        e("Num Bids: $numBids")
-//
-//        val bestBids = db.openOrdersDao().getBids()
-//        e("Size: ${bestBids.size}, BestBid: ${bestBids[0]}")
-//
-//        val bestAsks = db.openOrdersDao().getAsks()
-//        e("Size: ${bestAsks.size}, BestAsk: ${bestAsks[0]}")
-//      }
-//    }
-
       coordinatorLayout {
         lparams(width = matchParent, height = matchParent)
         backgroundColor = primaryColor
@@ -96,6 +82,11 @@ class MainActivity : LifecycleActivity() {
     val fragmentTransaction = supportFragmentManager.beginTransaction()
     fragmentTransaction.replace(123, entry.fragment)
     fragmentTransaction.commit()
+
+    if (entry.fragment is OpenOrdersFragment) {
+      e("RecyclerView: ${entry.fragment.recyclerView}")
+      entry.fragment.recyclerView?.smoothScrollToPosition(0)
+    }
 
     toolbar.title = entry.title
     invalidateOptionsMenu()

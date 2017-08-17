@@ -39,6 +39,8 @@ dependencies {
     compile 'org.jetbrains.anko:anko-design:0.10.1'
     compile 'org.jetbrains.anko:anko-recyclerview-v7:0.10.1'
 
+    compile 'commons-codec:commons-codec:1.9'
+
     compile 'com.squareup.okhttp3:okhttp:3.8.0'
 
     compile 'android.arch.lifecycle:runtime:1.0.0-alpha1'

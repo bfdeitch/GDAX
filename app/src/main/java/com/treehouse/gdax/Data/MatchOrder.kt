@@ -12,7 +12,7 @@ data class MatchOrder (
     @ColumnInfo var maker_order_id: String = "",
     @ColumnInfo var taker_order_id: String = "",
     @ColumnInfo var time: String = "",
-    @ColumnInfo var size: Float = 0f,
+    @ColumnInfo var size: Double = 0.0,
     @ColumnInfo var price: Float = 0f,
     @ColumnInfo var side: String = ""
 )

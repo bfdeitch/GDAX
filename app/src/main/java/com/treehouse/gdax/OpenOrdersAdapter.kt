@@ -8,7 +8,6 @@ import android.widget.TextView
 import com.treehouse.gdax.Data.PriceSideTuple
 import org.jetbrains.anko.*
 
-data class Order(val isBid: Boolean, val size: Float, val price: Float, val orderId: String)
 class OpenOrdersAdapter : RecyclerView.Adapter<OpenOrdersAdapter.ViewHolder>() {
     val openOrders = mutableListOf<PriceSideTuple>()
 
@@ -31,7 +30,9 @@ class OpenOrdersAdapter : RecyclerView.Adapter<OpenOrdersAdapter.ViewHolder>() {
         fun update(pst: PriceSideTuple) {
             val color = if (pst.side == "buy") green else red
             sizeBar.backgroundColor = color
-            val viewWidth = view.dip(if (pst.sum > 80) 80f else pst.sum + 1f)
+            val maxSizeWidth = view.context.widthPixels / 4f
+            val size = if (pst.sum > 1000) 1000f else pst.sum
+            val viewWidth = (size / 1000 * maxSizeWidth).toInt() + 1
             sizeBar.layoutParams = ConstraintLayout.LayoutParams(viewWidth, 0)
             sizeTextView.text = formatNumString(pst.sum, 8)
             priceTextView.text = formatNumString(pst.price, 2)

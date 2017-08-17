@@ -8,4 +8,5 @@
     android:layout_gravity="start"
     android:background="@color/colorPrimaryLight"
     app:itemTextColor="@android:color/white"
+    app:itemIconTint="@android:color/white"
     app:menu="@menu/bottom_navigation_items" />
