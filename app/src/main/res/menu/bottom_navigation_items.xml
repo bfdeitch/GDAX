@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/openOrders"
           android:icon="@drawable/ic_storage_black_24dp"
-          android:title="Open Orders"/>
+          android:title="Order Book"/>
     <item android:id="@+id/priceChart"
           android:icon="@drawable/ic_show_chart_black_24dp"
           android:title="Price Chart"/>

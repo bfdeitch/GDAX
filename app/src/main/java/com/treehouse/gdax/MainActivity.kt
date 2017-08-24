@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.support.design.widget.AppBarLayout
 import android.support.design.widget.BottomNavigationView
 import android.support.v4.app.Fragment
-import android.support.v4.widget.DrawerLayout
 import android.view.Gravity
 import android.widget.Toolbar
 import org.jetbrains.anko.*
@@ -16,7 +15,7 @@ import kotlin.concurrent.thread
 data class BottomNavEntry(val title: String, val fragment: Fragment)
 val bottomNavItems = arrayOf(
         BottomNavEntry("Order Book", OpenOrdersFragment()),
-        BottomNavEntry("Charts", OpenOrdersFragment()),
+        BottomNavEntry("Charts", ChartFragment()),
         BottomNavEntry("Trade History", TradeHistoryFragment()))
 
 class MainActivity : LifecycleActivity() {
@@ -37,12 +36,13 @@ class MainActivity : LifecycleActivity() {
 
     lifecycle.addObserver(MyWebSocket())
 
+    relativeLayout {
+      lparams(width = matchParent, height = matchParent)
       coordinatorLayout {
-        lparams(width = matchParent, height = matchParent)
         backgroundColor = primaryColor
 
         appBarLayout {
-          val actionBarHeight =  context.theme.obtainStyledAttributes(intArrayOf(android.R.attr.actionBarSize)).getDimension(0, 0f).toInt()
+          val actionBarHeight = context.theme.obtainStyledAttributes(intArrayOf(android.R.attr.actionBarSize)).getDimension(0, 0f).toInt()
           toolbar = toolbar {
             title = "Trade History"
             setTitleTextColor(Color.WHITE)
@@ -60,19 +60,24 @@ class MainActivity : LifecycleActivity() {
           behavior = AppBarLayout.ScrollingViewBehavior()
         }
 
-        val bottomNav = include<BottomNavigationView>(R.layout.bottom_navigation) {
-            setOnNavigationItemSelectedListener {
-              when (it.itemId) {
-                R.id.openOrders -> switchFragment(bottomNavItems[0])
-                R.id.priceChart -> switchFragment(bottomNavItems[1])
-                R.id.tradeHistory -> switchFragment(bottomNavItems[2])
-              }
-              true
-            }
-        }.lparams {
-          gravity = Gravity.BOTTOM
-        }
+
+      }.lparams(width = matchParent, height = matchParent) {
+        above(R.id.navigation)
       }
+
+      include<BottomNavigationView>(R.layout.bottom_navigation) {
+        setOnNavigationItemSelectedListener {
+          when (it.itemId) {
+            R.id.openOrders -> switchFragment(bottomNavItems[0])
+            R.id.priceChart -> switchFragment(bottomNavItems[1])
+            R.id.tradeHistory -> switchFragment(bottomNavItems[2])
+          }
+          true
+        }
+      }.lparams(width = matchParent) {
+        alignParentBottom()
+      }
+    }
 
     switchFragment(bottomNavItems[2])
   }

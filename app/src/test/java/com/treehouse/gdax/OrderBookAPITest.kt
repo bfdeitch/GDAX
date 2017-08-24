@@ -4,7 +4,7 @@ import com.github.kittinunf.fuel.*
 import org.json.JSONObject
 import org.junit.Test
 
-class APITest {
+class OrderBookAPITest {
     val endpoint = "https://api.gdax.com/products/ETH-USD/book?level=3"
 
     @Test

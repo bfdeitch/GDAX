@@ -5,9 +5,6 @@ import android.graphics.Color
 import android.util.DisplayMetrics
 import android.util.Log
 import org.jetbrains.anko.windowManager
-import java.text.DecimalFormat
-import java.text.DecimalFormatSymbols
-import java.util.*
 
 val Context.widthPixels: Int
   get() {
