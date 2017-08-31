@@ -13,7 +13,7 @@ import kotlin.concurrent.thread
 
 data class Candle(val time:Long, val low:Float, val high:Float, val open:Float, val close:Float, val volume:Double)
 class ChartView(context: Context) : View(context) {
-    val granularity = 15 * 60
+    val granularity = 60 * 60
     val endpoint = "https://api.gdax.com/products/ETH-USD/candles?granularity=$granularity"
     var candles = listOf<Candle>()
     val greenPaint = Paint()
@@ -21,8 +21,10 @@ class ChartView(context: Context) : View(context) {
 
     init {
         greenPaint.color = green
-        greenPaint.style = Paint.Style.FILL
+        greenPaint.style = Paint.Style.STROKE
+        greenPaint.strokeWidth = 3f
         redPaint.color = red
+        redPaint.strokeWidth = 3f
 
         endpoint.httpGet().responseString { request, response, result ->
             result.fold({ data ->
@@ -46,16 +48,34 @@ class ChartView(context: Context) : View(context) {
 
         // time, low, high, open, close, volume
         if (candles.isNotEmpty()) {
-            val candleWidth = canvas.width / (candles.size.toFloat())
-            val highestPrice = candles.maxBy { it.high }!!.high
-            val lowestPrice = candles.minBy { it.low }!!.low
 
-            candles.forEachIndexed { index, candle ->
-                val left = canvas.width - candleWidth * (index + 1f)
-                val right = canvas.width - candleWidth * index * 1f
-                val bottom = canvas.height - (candle.low - lowestPrice) / (highestPrice - lowestPrice) * canvas.height
-                val top = canvas.height - (candle.high - lowestPrice) / (highestPrice - lowestPrice) * canvas.height
-                canvas.drawRect(left, top, right, bottom, greenPaint)
+            val subCandles = candles.take(60)
+
+            val realHeight = canvas.height - dip(56) - 40
+            val chartWidth = canvas.width - 100
+            val candleWidth = chartWidth / subCandles.size.toFloat()
+            val highestPrice = subCandles.maxBy { it.high }!!.high
+            val lowestPrice = subCandles.minBy { it.low }!!.low
+
+            fun scaledHeight(y: Float) = realHeight - (y - lowestPrice) /  (highestPrice - lowestPrice) * realHeight
+
+            subCandles.forEachIndexed { index, candle ->
+                val left = chartWidth - candleWidth * (index + 1f) + 8f
+                val right = chartWidth - candleWidth * index * 1f
+                val midpoint = left + (right - left) / 2f
+
+                var paint = greenPaint
+                var bottom = scaledHeight(candle.open)
+                var top = scaledHeight(candle.close)
+                if (candle.close < candle.open) {
+                    paint = redPaint
+                    bottom = scaledHeight(candle.close)
+                    top = scaledHeight(candle.open)
+                }
+
+                canvas.drawRect(left, top, right, bottom, paint)
+                canvas.drawLine(midpoint, top, midpoint, scaledHeight(candle.high), paint)
+                canvas.drawLine(midpoint, bottom, midpoint, scaledHeight(candle.low), paint)
             }
 
             e("highest: $highestPrice, lowest: $lowestPrice, canvas height: ${canvas.height}")

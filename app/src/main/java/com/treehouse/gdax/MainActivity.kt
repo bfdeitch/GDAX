@@ -5,8 +5,8 @@ import android.graphics.Color
 import android.os.Bundle
 import android.support.design.widget.AppBarLayout
 import android.support.design.widget.BottomNavigationView
+import android.support.design.widget.CoordinatorLayout
 import android.support.v4.app.Fragment
-import android.view.Gravity
 import android.widget.Toolbar
 import org.jetbrains.anko.*
 import org.jetbrains.anko.design.*
@@ -15,10 +15,13 @@ import kotlin.concurrent.thread
 data class BottomNavEntry(val title: String, val fragment: Fragment)
 val bottomNavItems = arrayOf(
         BottomNavEntry("Order Book", OpenOrdersFragment()),
-        BottomNavEntry("Charts", ChartFragment()),
+        BottomNavEntry("Price Chart", ChartFragment()),
         BottomNavEntry("Trade History", TradeHistoryFragment()))
 
 class MainActivity : LifecycleActivity() {
+  var currentFragmentId = 2
+  lateinit var coordinatorLayout: CoordinatorLayout
+  lateinit var appBarLayout: AppBarLayout
   lateinit var toolbar: Toolbar
 
   fun logDatabase() {
@@ -38,10 +41,10 @@ class MainActivity : LifecycleActivity() {
 
     relativeLayout {
       lparams(width = matchParent, height = matchParent)
-      coordinatorLayout {
+      coordinatorLayout = coordinatorLayout {
         backgroundColor = primaryColor
 
-        appBarLayout {
+        appBarLayout = appBarLayout {
           val actionBarHeight = context.theme.obtainStyledAttributes(intArrayOf(android.R.attr.actionBarSize)).getDimension(0, 0f).toInt()
           toolbar = toolbar {
             title = "Trade History"
@@ -60,7 +63,6 @@ class MainActivity : LifecycleActivity() {
           behavior = AppBarLayout.ScrollingViewBehavior()
         }
 
-
       }.lparams(width = matchParent, height = matchParent) {
         above(R.id.navigation)
       }
@@ -68,9 +70,9 @@ class MainActivity : LifecycleActivity() {
       include<BottomNavigationView>(R.layout.bottom_navigation) {
         setOnNavigationItemSelectedListener {
           when (it.itemId) {
-            R.id.openOrders -> switchFragment(bottomNavItems[0])
-            R.id.priceChart -> switchFragment(bottomNavItems[1])
-            R.id.tradeHistory -> switchFragment(bottomNavItems[2])
+            R.id.openOrders -> switchFragment(0)
+            R.id.priceChart -> switchFragment(1)
+            R.id.tradeHistory -> switchFragment(2)
           }
           true
         }
@@ -79,11 +81,30 @@ class MainActivity : LifecycleActivity() {
       }
     }
 
-    switchFragment(bottomNavItems[2])
+    switchFragment(2)
   }
 
-  fun switchFragment(entry: BottomNavEntry) {
-    e("SWITCH FRAGMENT: ${entry.fragment}")
+  override fun onRestoreInstanceState(bundle: Bundle) {
+    val fragmentId = bundle.getInt("FRAGMENT", 2)
+    switchFragment(fragmentId)
+  }
+
+  override fun onSaveInstanceState(bundle: Bundle) {
+    super.onSaveInstanceState(bundle)
+    bundle.putInt("FRAGMENT", currentFragmentId)
+  }
+
+  fun switchFragment(fragmentId: Int) {
+    currentFragmentId = fragmentId
+    val entry = bottomNavItems[fragmentId]
+    e("SWITCH FRAGMENT1: ${entry.fragment}")
+
+    //https://stackoverflow.com/questions/30554824/how-to-reset-the-toolbar-position-controlled-by-the-coordinatorlayout
+    val consumed = IntArray(2)
+    val behavior = (appBarLayout.layoutParams as CoordinatorLayout.LayoutParams).behavior
+    behavior?.onNestedPreScroll(coordinatorLayout, appBarLayout, null, 0, -1000, consumed)
+
+    e("SWITCH FRAGMENT2: ${entry.fragment}")
     val fragmentTransaction = supportFragmentManager.beginTransaction()
     fragmentTransaction.replace(123, entry.fragment)
     fragmentTransaction.commit()
