@@ -7,7 +7,6 @@ import android.arch.lifecycle.MutableLiveData
 import com.treehouse.gdax.Data.OpenOrder
 import com.treehouse.gdax.Data.PriceSideTuple
 
-
 class OpenOrdersViewModel (app: Application) : AndroidViewModel(app) {
     val openOrders: LiveData<List<PriceSideTuple>> = MutableLiveData<List<PriceSideTuple>>()
         get() {

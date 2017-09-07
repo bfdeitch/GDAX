@@ -11,6 +11,13 @@ import android.widget.Toolbar
 import org.jetbrains.anko.*
 import org.jetbrains.anko.design.*
 import kotlin.concurrent.thread
+import android.graphics.PorterDuff
+import android.view.Gravity
+import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.Spinner
+
 
 data class BottomNavEntry(val title: String, val fragment: Fragment)
 val bottomNavItems = arrayOf(
@@ -20,9 +27,11 @@ val bottomNavItems = arrayOf(
 
 class MainActivity : LifecycleActivity() {
   var currentFragmentId = 2
+  var selectedGranularityId = 0
   lateinit var coordinatorLayout: CoordinatorLayout
   lateinit var appBarLayout: AppBarLayout
   lateinit var toolbar: Toolbar
+  lateinit var spinner: Spinner
 
   fun logDatabase() {
     thread {
@@ -50,6 +59,28 @@ class MainActivity : LifecycleActivity() {
             title = "Trade History"
             setTitleTextColor(Color.WHITE)
             backgroundColor = primaryColorLight
+
+            spinner = spinner {
+              val choices = arrayOf("15m", "1h", "6h", "1d")
+              val spinnerArrayAdapter = ArrayAdapter<String>(this@MainActivity, R.layout.spinner_item, choices)
+              spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item)
+              adapter = spinnerArrayAdapter
+              background.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP)
+              onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onNothingSelected(adapterView: AdapterView<*>) {}
+                override fun onItemSelected(adapterView: AdapterView<*>, view: View, position: Int, id: Long) {
+                  selectedGranularityId = position
+                  val granularity = when (position) {
+                    0 -> 15 * 60
+                    1 -> 60 * 60
+                    2 -> 6 * 60 * 60
+                    else -> 24 * 60 * 60
+                  }
+                  (bottomNavItems[1].fragment as ChartFragment).chartView.resetCandles(granularity)
+                }
+
+              }
+            }.lparams(Gravity.RIGHT)
           }.lparams(width = matchParent, height = actionBarHeight) {
             scrollFlags = AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL or
                     AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS
@@ -86,33 +117,35 @@ class MainActivity : LifecycleActivity() {
 
   override fun onRestoreInstanceState(bundle: Bundle) {
     val fragmentId = bundle.getInt("FRAGMENT", 2)
+    val granularity = bundle.getInt("GRANULARITY", 0)
     switchFragment(fragmentId)
+    spinner.setSelection(granularity)
   }
 
   override fun onSaveInstanceState(bundle: Bundle) {
     super.onSaveInstanceState(bundle)
     bundle.putInt("FRAGMENT", currentFragmentId)
+    bundle.putInt("GRANULARITY", selectedGranularityId)
   }
 
   fun switchFragment(fragmentId: Int) {
     currentFragmentId = fragmentId
     val entry = bottomNavItems[fragmentId]
-    e("SWITCH FRAGMENT1: ${entry.fragment}")
 
     //https://stackoverflow.com/questions/30554824/how-to-reset-the-toolbar-position-controlled-by-the-coordinatorlayout
     val consumed = IntArray(2)
     val behavior = (appBarLayout.layoutParams as CoordinatorLayout.LayoutParams).behavior
     behavior?.onNestedPreScroll(coordinatorLayout, appBarLayout, null, 0, -1000, consumed)
 
-    e("SWITCH FRAGMENT2: ${entry.fragment}")
     val fragmentTransaction = supportFragmentManager.beginTransaction()
     fragmentTransaction.replace(123, entry.fragment)
     fragmentTransaction.commit()
 
     if (entry.fragment is OpenOrdersFragment) {
-      e("RecyclerView: ${entry.fragment.recyclerView}")
       entry.fragment.recyclerView?.smoothScrollToPosition(0)
     }
+
+    spinner.visibility = if (entry.fragment is ChartFragment) View.VISIBLE else View.GONE
 
     toolbar.title = entry.title
     invalidateOptionsMenu()
