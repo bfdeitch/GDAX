@@ -7,12 +7,12 @@ import android.graphics.Paint
 import android.text.format.DateFormat
 import android.view.View
 import com.github.kittinunf.fuel.httpGet
+import com.treehouse.gdax.App.Companion.candles
 import org.jetbrains.anko.*
 import java.util.*
 
 data class Candle(val time:Long, val low:Float, val high:Float, val open:Float, val close:Float, val volume:Double)
 class ChartView(context: Context) : View(context) {
-    var candles = listOf<Candle>()
     val greenPaint = Paint()
     val redPaint = Paint()
     val whitePaint = Paint()
@@ -26,10 +26,13 @@ class ChartView(context: Context) : View(context) {
         whitePaint.color = Color.WHITE
         whitePaint.textSize = 36f
 
-        resetCandles(60 * 60)
+        if (candles.isEmpty()) {
+            resetCandles(15 * 60)
+        }
     }
 
     fun resetCandles(granularity: Int) {
+        e("API CALL: $granularity")
         val endpoint = "https://api.gdax.com/products/ETH-USD/candles?granularity=$granularity"
         endpoint.httpGet().responseString { request, response, result ->
             result.fold({ data ->
@@ -38,7 +41,7 @@ class ChartView(context: Context) : View(context) {
                 candles = cleanedData.split("],[").map {
                     val a = it.split(",")
                     Candle(a[0].toLong(), a[1].toFloat(), a[2].toFloat(), a[3].toFloat(), a[4].toFloat(), a[5].toDouble())
-                }
+                }.toMutableList()
                 context.runOnUiThread { invalidate() }
             }, { err ->
 

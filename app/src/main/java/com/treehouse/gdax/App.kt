@@ -15,14 +15,16 @@ val db by lazy {
 
 class App : Application() {
     companion object {
+        var candles = mutableListOf<Candle>()
+        var selectedGranularityId = 0
         var tempDB: AppDatabase? = null
     }
 
     override fun onCreate() {
-        tempDB = Room.databaseBuilder(this, AppDatabase::class.java, "GDAX").build()
-        clearDatabase()
-        downloadOrderBook()
-        super.onCreate()
+            tempDB = Room.databaseBuilder(this, AppDatabase::class.java, "GDAX").build()
+            clearDatabase()
+            downloadOrderBook()
+            super.onCreate()
     }
 
     fun clearDatabase() {

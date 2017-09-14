@@ -17,6 +17,7 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Spinner
+import com.treehouse.gdax.App.Companion.selectedGranularityId
 
 
 data class BottomNavEntry(val title: String, val fragment: Fragment)
@@ -27,7 +28,6 @@ val bottomNavItems = arrayOf(
 
 class MainActivity : LifecycleActivity() {
   var currentFragmentId = 2
-  var selectedGranularityId = 0
   lateinit var coordinatorLayout: CoordinatorLayout
   lateinit var appBarLayout: AppBarLayout
   lateinit var toolbar: Toolbar
@@ -56,7 +56,6 @@ class MainActivity : LifecycleActivity() {
         appBarLayout = appBarLayout {
           val actionBarHeight = context.theme.obtainStyledAttributes(intArrayOf(android.R.attr.actionBarSize)).getDimension(0, 0f).toInt()
           toolbar = toolbar {
-            title = "Trade History"
             setTitleTextColor(Color.WHITE)
             backgroundColor = primaryColorLight
 
@@ -69,14 +68,17 @@ class MainActivity : LifecycleActivity() {
               onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onNothingSelected(adapterView: AdapterView<*>) {}
                 override fun onItemSelected(adapterView: AdapterView<*>, view: View, position: Int, id: Long) {
-                  selectedGranularityId = position
-                  val granularity = when (position) {
-                    0 -> 15 * 60
-                    1 -> 60 * 60
-                    2 -> 6 * 60 * 60
-                    else -> 24 * 60 * 60
+                  e("ITEM SELECTED: $position")
+                  if (selectedGranularityId != position) {
+                    selectedGranularityId = position
+                    val granularity = when (position) {
+                      0 -> 15 * 60
+                      1 -> 60 * 60
+                      2 -> 6 * 60 * 60
+                      else -> 24 * 60 * 60
+                    }
+                    (bottomNavItems[1].fragment as ChartFragment).chartView.resetCandles(granularity)
                   }
-                  (bottomNavItems[1].fragment as ChartFragment).chartView.resetCandles(granularity)
                 }
 
               }
@@ -112,20 +114,18 @@ class MainActivity : LifecycleActivity() {
       }
     }
 
-    switchFragment(2)
+    switchFragment(1)
   }
 
   override fun onRestoreInstanceState(bundle: Bundle) {
     val fragmentId = bundle.getInt("FRAGMENT", 2)
-    val granularity = bundle.getInt("GRANULARITY", 0)
     switchFragment(fragmentId)
-    spinner.setSelection(granularity)
+    spinner.setSelection(selectedGranularityId)
   }
 
   override fun onSaveInstanceState(bundle: Bundle) {
     super.onSaveInstanceState(bundle)
     bundle.putInt("FRAGMENT", currentFragmentId)
-    bundle.putInt("GRANULARITY", selectedGranularityId)
   }
 
   fun switchFragment(fragmentId: Int) {

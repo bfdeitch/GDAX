@@ -70,7 +70,7 @@ class MessageParser(val db: AppDatabase) {
       makerOrder.remaining_size -= size
       db.openOrdersDao().updateOrder(makerOrder)
     } else {
-      e("MAKER ORDER IS NULL")
+
     }
   }
 

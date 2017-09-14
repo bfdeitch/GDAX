@@ -3,13 +3,8 @@ package com.treehouse.gdax
 import android.arch.lifecycle.Lifecycle
 import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.OnLifecycleEvent
-import android.util.Base64
-import android.util.Base64.encodeToString
 import okhttp3.*
-import java.security.InvalidKeyException
 import java.util.concurrent.TimeUnit
-import javax.crypto.Mac
-import javax.crypto.spec.SecretKeySpec
 
 class MyWebSocket : LifecycleObserver {
     val parser = MessageParser(db)
